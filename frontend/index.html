@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HealthCareHub Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-gray-50 flex h-screen overflow-hidden">
+
+    <!-- Sidebar -->
+    <aside class="w-64 bg-blue-900 text-white flex flex-col hidden md:flex">
+        <div class="h-16 flex items-center px-6 font-bold text-xl tracking-wider border-b border-blue-800">
+            <i class="fas fa-heartbeat mr-3 text-red-400"></i> HealthCareHub
+        </div>
+        <nav class="flex-1 px-4 py-6 space-y-2">
+            <button onclick="loadDashboard()" class="w-full flex items-center px-4 py-3 bg-blue-800 rounded-lg text-left transition hover:bg-blue-700">
+                <i class="fas fa-chart-line w-6 text-blue-300"></i> Dashboard
+            </button>
+            <button onclick="loadData('patients')" class="w-full flex items-center px-4 py-3 rounded-lg text-left transition hover:bg-blue-800 text-gray-300 hover:text-white">
+                <i class="fas fa-users w-6 text-blue-300"></i> Patients
+            </button>
+            <button onclick="loadData('doctors')" class="w-full flex items-center px-4 py-3 rounded-lg text-left transition hover:bg-blue-800 text-gray-300 hover:text-white">
+                <i class="fas fa-user-md w-6 text-blue-300"></i> Doctors
+            </button>
+            <button onclick="loadData('appointments')" class="w-full flex items-center px-4 py-3 rounded-lg text-left transition hover:bg-blue-800 text-gray-300 hover:text-white">
+                <i class="fas fa-calendar-check w-6 text-blue-300"></i> Appointments
+            </button>
+            <button onclick="alert('Feature coming soon!')" class="w-full flex items-center px-4 py-3 rounded-lg text-left transition hover:bg-blue-800 text-gray-300 hover:text-white">
+                <i class="fas fa-pills w-6 text-blue-300"></i> Pharmacy
+            </button>
+            <button onclick="alert('Feature coming soon!')" class="w-full flex items-center px-4 py-3 rounded-lg text-left transition hover:bg-blue-800 text-gray-300 hover:text-white">
+                <i class="fas fa-flask w-6 text-blue-300"></i> Laboratory
+            </button>
+            <button onclick="alert('Feature coming soon!')" class="w-full flex items-center px-4 py-3 rounded-lg text-left transition hover:bg-blue-800 text-gray-300 hover:text-white">
+                <i class="fas fa-file-invoice-dollar w-6 text-blue-300"></i> Billing
+            </button>
+        </nav>
+        <div class="p-4 border-t border-blue-800">
+            <button class="w-full flex items-center px-4 py-2 text-red-300 hover:text-red-100 hover:bg-blue-800 rounded-lg transition">
+                <i class="fas fa-sign-out-alt w-6"></i> Logout
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 flex flex-col h-screen overflow-y-auto">
+        <!-- Header -->
+        <header class="h-16 bg-white shadow-sm flex items-center justify-between px-8">
+            <h2 id="pageTitle" class="text-xl font-semibold text-gray-800">Dashboard Overview</h2>
+            <div class="flex items-center space-x-4">
+                <button class="text-gray-500 hover:text-blue-600 transition"><i class="fas fa-bell"></i></button>
+                <div class="h-8 w-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold">A</div>
+            </div>
+        </header>
+
+        <!-- Content Area -->
+        <div class="p-8">
+            
+            <!-- Quick Action Buttons -->
+            <div class="mb-8 flex space-x-4">
+                <button onclick="loadData('patients')" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg shadow-sm font-medium transition flex items-center">
+                    <i class="fas fa-plus-circle mr-2"></i> Register Patient
+                </button>
+                <button onclick="loadData('appointments')" class="bg-green-600 hover:bg-green-700 text-white px-5 py-2.5 rounded-lg shadow-sm font-medium transition flex items-center">
+                    <i class="fas fa-calendar-plus mr-2"></i> Book Appointment
+                </button>
+                <button onclick="loadData('doctors')" class="bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 px-5 py-2.5 rounded-lg shadow-sm font-medium transition flex items-center">
+                    <i class="fas fa-search mr-2"></i> Find Doctor
+                </button>
+                <button onclick="alert('Printing report...')" class="bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 px-5 py-2.5 rounded-lg shadow-sm font-medium transition flex items-center">
+                    <i class="fas fa-print mr-2"></i> Print Report
+                </button>
+            </div>
+
+            <div id="contentArea" class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 min-h-[400px]">
+                <div class="flex justify-center items-center h-full text-gray-400">
+                    <i class="fas fa-circle-notch fa-spin fa-2x"></i>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        async function loadDashboard() {
+            document.getElementById('pageTitle').innerText = 'Dashboard Overview';
+            const content = document.getElementById('contentArea');
+            content.innerHTML = '<div class="flex justify-center p-12"><i class="fas fa-circle-notch fa-spin fa-2x text-blue-600"></i></div>';
+            
+            try {
+                const res = await fetch('/api/stats');
+                const data = await res.json();
+                content.innerHTML = `
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                        <div class="bg-blue-50 p-6 rounded-xl border border-blue-100">
+                            <div class="text-blue-500 mb-2"><i class="fas fa-users fa-lg"></i></div>
+                            <div class="text-3xl font-bold text-gray-800">${data.patients}</div>
+                            <div class="text-sm text-gray-500 mt-1">Total Patients</div>
+                        </div>
+                        <div class="bg-green-50 p-6 rounded-xl border border-green-100">
+                            <div class="text-green-500 mb-2"><i class="fas fa-user-md fa-lg"></i></div>
+                            <div class="text-3xl font-bold text-gray-800">${data.doctors}</div>
+                            <div class="text-sm text-gray-500 mt-1">Active Doctors</div>
+                        </div>
+                        <div class="bg-purple-50 p-6 rounded-xl border border-purple-100">
+                            <div class="text-purple-500 mb-2"><i class="fas fa-calendar-check fa-lg"></i></div>
+                            <div class="text-3xl font-bold text-gray-800">${data.appointments_today}</div>
+                            <div class="text-sm text-gray-500 mt-1">Appointments Today</div>
+                        </div>
+                        <div class="bg-orange-50 p-6 rounded-xl border border-orange-100">
+                            <div class="text-orange-500 mb-2"><i class="fas fa-dollar-sign fa-lg"></i></div>
+                            <div class="text-3xl font-bold text-gray-800">${data.revenue}</div>
+                            <div class="text-sm text-gray-500 mt-1">Today's Revenue</div>
+                        </div>
+                    </div>
+                `;
+            } catch(e) {
+                content.innerHTML = '<div class="text-red-500">Error loading dashboard</div>';
+            }
+        }
+
+        async function loadData(type) {
+            const titles = {
+                'patients': 'Patient Directory',
+                'doctors': 'Medical Staff',
+                'appointments': 'Appointment Schedule'
+            };
+            
+            document.getElementById('pageTitle').innerText = titles[type];
+            const content = document.getElementById('contentArea');
+            content.innerHTML = '<div class="flex justify-center p-12"><i class="fas fa-circle-notch fa-spin fa-2x text-blue-600"></i></div>';
+            
+            try {
+                const res = await fetch('/api/' + type);
+                const data = await res.json();
+                
+                let html = '<div class="overflow-x-auto"><table class="w-full text-left border-collapse"><thead><tr class="bg-gray-50 border-b border-gray-200">';
+                
+                if (data.length > 0) {
+                    // Headers
+                    Object.keys(data[0]).forEach(key => {
+                        html += `<th class="p-4 text-sm font-semibold text-gray-600 uppercase">${key}</th>`;
+                    });
+                    html += '<th class="p-4 text-sm font-semibold text-gray-600 uppercase">Actions</th></tr></thead><tbody class="divide-y divide-gray-100">';
+                    
+                    // Rows
+                    data.forEach(item => {
+                        html += '<tr class="hover:bg-gray-50 transition">';
+                        Object.values(item).forEach(val => {
+                            html += `<td class="p-4 text-gray-800">${val}</td>`;
+                        });
+                        html += `
+                            <td class="p-4">
+                                <button class="text-blue-600 hover:text-blue-800 mr-3"><i class="fas fa-edit"></i> Edit</button>
+                                <button class="text-red-600 hover:text-red-800"><i class="fas fa-trash"></i> Delete</button>
+                            </td>
+                        </tr>`;
+                    });
+                } else {
+                    html += '<tr><td class="p-4 text-center text-gray-500">No data found</td></tr>';
+                }
+                
+                html += '</tbody></table></div>';
+                content.innerHTML = html;
+            } catch(e) {
+                content.innerHTML = '<div class="text-red-500">Error loading data</div>';
+            }
+        }
+
+        // Load dashboard on start
+        loadDashboard();
+    </script>
+</body>
+</html>
